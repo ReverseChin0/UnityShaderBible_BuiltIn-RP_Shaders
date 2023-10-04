@@ -1,0 +1,30 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain //id 0
+//#pragma kernel CSFunction01 // id 1
+//#pragma kernel CSFunction02 // id 2
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+
+Texture2D<float4> ColTex;
+SamplerState sampler_ColTex;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+    uint width;
+    uint height;
+    Result.GetDimensions(width, height);//void
+    // si la textura ha sido configurada como Wrap Mode = Clamp
+    float2 uv = float2(id.xy / float2(width, height));
+    float4 col = ColTex.SampleLevel(sampler_ColTex, uv, 0);
+    
+    // si la textura ha sido configurada como Wrap Mode = Repeat
+    //float2 uv = float2((id.xy + float2(0.5, 0.5)) / float2(width, height));
+
+    //Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+    //Result[id.xy] = float4(0, 1, 0, 1);
+    Result[id.xy] = col;
+}
